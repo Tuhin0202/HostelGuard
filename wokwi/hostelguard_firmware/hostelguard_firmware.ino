@@ -8,16 +8,13 @@
 #include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 #include <DHT.h>
+#include "supabase_config.h"
 
 // ---- WiFi ----
 // "Wokwi-GUEST" only works inside the Wokwi simulator and has real internet
 // access. On real hardware, replace with your actual WiFi credentials.
 const char *WIFI_SSID = "Wokwi-GUEST";
 const char *WIFI_PASS = "";
-
-// ---- Supabase project config — fill these in from Settings > API ----
-const char *SUPABASE_URL = "https://onjvjbbzvykgsjlkqunz.supabase.co";
-const char *SUPABASE_ANON_KEY = "sb_publishable_Krr4kyS1XXkIgLpRlnM-bQ_pT8k-uDW";
 
 // ---- Pins ----
 #define DHT_PIN 4

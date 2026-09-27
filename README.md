@@ -25,17 +25,20 @@ hostelguard/
 
 1. Install the **Wokwi Simulator** VS Code extension.
 2. Open the `wokwi/` folder in VS Code.
-3. In `hostelguard_firmware.ino`, fill in:
+3. Copy `hostelguard_firmware/supabase_config.h.example` to
+   `hostelguard_firmware/supabase_config.h`, then fill in your values there:
    ```cpp
-   const char* SUPABASE_URL      = "https://YOUR-PROJECT-REF.supabase.co";
-   const char* SUPABASE_ANON_KEY = "YOUR-ANON-KEY";
+   #define SUPABASE_URL "https://YOUR-PROJECT-REF.supabase.co"
+   #define SUPABASE_ANON_KEY "YOUR-ANON-KEY"
    ```
+   The real `supabase_config.h` file is ignored by Git and is not committed.
 4. Press `F1` → **Arduino: Verify** to compile (needs the `esp32` board package
    and the `DHT sensor library` + `Adafruit Unified Sensor` libraries installed
    via the Arduino extension's Library Manager).
 5. Press `F1` → **Wokwi: Start Simulator**.
 
 Notes on the circuit:
+
 - The MQ-2 gas sensor is `wokwi-gas-sensor`, analog out on GPIO 34. Drag its
   slider (or click it) to raise the ppm value and trigger the gas alarm.
 - **Wokwi has no built-in flame sensor part**, so a photoresistor
@@ -83,4 +86,4 @@ the Wokwi sim posts its first data point.
 - Skip `humidity` card — it's informational only, not alarm-linked.
 - If `npm install` is slow on the day, the dashboard is the least essential
   demo piece — Wokwi's own Serial Monitor output (`gas=.. flame=.. temp=..
-  alarm=..`) is enough to prove the sensing + threshold logic works.
+alarm=..`) is enough to prove the sensing + threshold logic works.

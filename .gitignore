@@ -21,6 +21,7 @@ wokwi/hostelguard_firmware/build/
 wokwi/hostelguard_firmware/*.hex
 wokwi/hostelguard_firmware/*.bin
 wokwi/hostelguard_firmware/*.elf
+wokwi/hostelguard_firmware/supabase_config.h
 
 # Editor and operating system files
 .vscode/
