@@ -1,89 +1,106 @@
-# HostelGuard — Gas & Fire Safety Monitor
+# HostelGuard
 
-24hr-hackathon build. ESP32 reads gas/smoke, flame, temp & humidity, sounds
-a local alarm, and pushes live data straight to Supabase — no custom backend.
-A React dashboard subscribes to Supabase Realtime and shows live readings +
-an alert log.
+**Real-time IoT gas & fire safety monitor for hostels and labs — built and demoed entirely with free, simulated hardware.**
+
+Healthcare & Safety track · 24-hour hackathon build
+
+---
+
+## The problem
+
+Hostels, labs, and shared living spaces rarely have any automated hazard detection. A gas leak or small fire can go unnoticed until it's serious — especially at night or in an unattended room. Commercial IoT safety systems exist but are closed, expensive, and out of reach for a student prototype. HostelGuard shows a meaningful version of this can be built, simulated, and demoed in a day, using entirely free tools.
+
+## What it does
+
+- Continuously monitors **gas/smoke**, **flame**, and **temperature/humidity**
+- Sounds a **local buzzer + LED alarm instantly** the moment any threshold is crossed — no network dependency for this part
+- Pushes every reading and every alert to a **live cloud database**, with **zero custom backend**
+- A web dashboard reflects new hazards in **real time**, no page refresh needed
+- Keeps a full history of every alert, with timestamps
+
+## Architecture
+
+```
+ ┌──────────────────────┐      HTTPS POST       ┌────────────────┐      Realtime push      ┌───────────────────┐
+ │   Simulated ESP32     │ ───────────────────▶  │    Supabase    │ ───────────────────────▶ │  React Dashboard   │
+ │   (Wokwi, in-browser) │   readings + alerts   │ (Postgres +    │      (WebSocket)         │  (Vite, 4 pages)   │
+ │   MQ-2 · DHT22 ·       │                        │  Realtime)     │                           │                    │
+ │   flame-sensor stand-in│                       └────────────────┘                           └───────────────────┘
+ │   + buzzer + LED       │
+ └──────────────────────┘
+```
+
+Alarm decisions happen **locally on the ESP32 first** — the buzzer/LED react instantly regardless of internet state. A reading is posted every 5 seconds regardless of alarm state; a one-off alert row is posted only on the moment a hazard *starts*.
+
+## Tech stack
+
+| Layer | Tool | Notes |
+|---|---|---|
+| Sensing | ESP32, MQ-2 gas sensor, DHT22, photoresistor | All simulated in [Wokwi](https://wokwi.com) — no physical hardware required. Photoresistor stands in for a flame sensor (Wokwi has no native flame part) |
+| Firmware | Arduino (C++) | Threshold logic, local alarm, HTTPS POST to Supabase |
+| Backend | [Supabase](https://supabase.com) | Postgres database + REST API + Realtime — no custom server |
+| Frontend | React + Vite, `react-router-dom`, `recharts` | 4-page live dashboard |
+
+## Dashboard pages
+
+| Route | Purpose |
+|---|---|
+| `/` | Landing page — problem, how it works, hazard types |
+| `/dashboard` | Live readouts + alert log, updating in real time |
+| `/history` | Trend charts of recent readings + summary stats |
+| `/about` | Architecture diagram, tech stack, problem statement |
+
+## Project structure
 
 ```
 hostelguard/
-├── wokwi/                        # circuit + firmware (simulate in Wokwi)
-│   ├── diagram.json
+├── wokwi/
+│   ├── diagram.json                 # circuit: ESP32 + sensors + buzzer/LED
 │   ├── wokwi.toml
-│   └── hostelguard_firmware/hostelguard_firmware.ino
-├── supabase/schema.sql           # run once in Supabase SQL Editor
-└── dashboard/                    # React + Vite live dashboard
+│   └── hostelguard_firmware/
+│       └── hostelguard_firmware.ino # sensing + alarm logic + Supabase POSTs
+├── supabase/
+│   └── schema.sql                   # readings + alerts tables, RLS, realtime
+├── dashboard/
+│   ├── package.json
+│   ├── vite.config.js
+│   ├── .env.example
+│   └── src/
+│       ├── App.jsx                  # router shell
+│       ├── components/Nav.jsx
+│       ├── pages/
+│       │   ├── Landing.jsx
+│       │   ├── Dashboard.jsx
+│       │   ├── History.jsx
+│       │   └── About.jsx
+│       ├── supabaseClient.js
+│       └── index.css
+└── README.md
 ```
 
-## 1. Supabase (5 min)
+## Getting started
 
-1. Create a project at supabase.com.
-2. Dashboard > SQL Editor > New query > paste `supabase/schema.sql` > Run.
-3. Dashboard > Settings > API — copy your **Project URL** and **anon public key**.
+**1. Database**
+Create a free [Supabase](https://supabase.com) project → SQL Editor → run `supabase/schema.sql` → copy your Project URL and anon key from Settings → API.
 
-## 2. Simulate in Wokwi (10 min)
+**2. Simulation**
+Go to [wokwi.com](https://wokwi.com) → new ESP32 project → paste in `wokwi/hostelguard_firmware/hostelguard_firmware.ino` and `wokwi/diagram.json` → add your Supabase credentials into the firmware → run the simulation.
 
-1. Install the **Wokwi Simulator** VS Code extension.
-2. Open the `wokwi/` folder in VS Code.
-3. Copy `hostelguard_firmware/supabase_config.h.example` to
-   `hostelguard_firmware/supabase_config.h`, then fill in your values there:
-   ```cpp
-   #define SUPABASE_URL "https://YOUR-PROJECT-REF.supabase.co"
-   #define SUPABASE_ANON_KEY "YOUR-ANON-KEY"
-   ```
-   The real `supabase_config.h` file is ignored by Git and is not committed.
-4. Press `F1` → **Arduino: Verify** to compile (needs the `esp32` board package
-   and the `DHT sensor library` + `Adafruit Unified Sensor` libraries installed
-   via the Arduino extension's Library Manager).
-5. Press `F1` → **Wokwi: Start Simulator**.
-
-Notes on the circuit:
-
-- The MQ-2 gas sensor is `wokwi-gas-sensor`, analog out on GPIO 34. Drag its
-  slider (or click it) to raise the ppm value and trigger the gas alarm.
-- **Wokwi has no built-in flame sensor part**, so a photoresistor
-  (`wokwi-photoresistor-sensor`) stands in for a KY-026 flame sensor's analog
-  output on GPIO 35 — click it and drag to simulate rising flame brightness.
-  Swap in a real KY-026 on physical hardware; the firmware logic is identical.
-- DHT22 simulates temp/humidity (SDA on GPIO 4). Wokwi doesn't have a DHT11
-  part — the firmware reads it as DHT22, which is a drop-in swap for DHT11
-  on real hardware (just change `DHTTYPE` to `DHT11`).
-- Buzzer (GPIO 25) + red LED (GPIO 26, via 220Ω resistor) fire together when
-  any threshold is breached.
-
-## 3. Run the dashboard (5 min)
-
-```powershell
-cd hostelguard\dashboard
+**3. Dashboard**
+```bash
+cd dashboard
 npm install
-copy .env.example .env
-```
-
-Edit `.env` with your Supabase URL + anon key, then:
-
-```powershell
+cp .env.example .env   # fill in your Supabase URL + anon key
 npm run dev
 ```
 
-Open the printed `localhost` URL. It'll show "Awaiting first reading…" until
-the Wokwi sim posts its first data point.
+## Known limitations / what's next
 
-## Demo script
+- Readouts currently show **% of sensor range**, not calibrated ppm — true ppm needs a physical clean-air calibration step (R0) that isn't meaningful in a simulator
+- Single simulated node (`room_label` is hardcoded) — the schema already supports multiple rooms, just not wired into the UI yet
+- No SMS/push notifications — dashboard + local buzzer only, for now
+- No auth on the dashboard — fine for a demo, not for production
 
-1. Start the Wokwi sim, open the dashboard side-by-side.
-2. Let it run a few seconds — cards populate, status pill shows "MONITORING".
-3. Drag the gas sensor slider up past ~1500 → buzzer sounds in Wokwi, LED
-   lights, dashboard card turns red, alert log gets a new "gas" row in
-   real time.
-4. Repeat with the photoresistor (flame) or nudge DHT22 temperature up in
-   its attrs panel to show all three hazard types firing independently.
-5. Bring the value back down to show the alarm clearing while the alert
-   history stays logged.
+## License
 
-## What to cut if you're short on time
-
-- Skip the LED/resistor wiring — the buzzer alone is enough to demo the alarm.
-- Skip `humidity` card — it's informational only, not alarm-linked.
-- If `npm install` is slow on the day, the dashboard is the least essential
-  demo piece — Wokwi's own Serial Monitor output (`gas=.. flame=.. temp=..
-alarm=..`) is enough to prove the sensing + threshold logic works.
+MIT — free to use, modify, and build on.
