@@ -30,25 +30,25 @@ Hostels, labs, and shared living spaces rarely have any automated hazard detecti
  └──────────────────────┘
 ```
 
-Alarm decisions happen **locally on the ESP32 first** — the buzzer/LED react instantly regardless of internet state. A reading is posted every 5 seconds regardless of alarm state; a one-off alert row is posted only on the moment a hazard *starts*.
+Alarm decisions happen **locally on the ESP32 first** — the buzzer/LED react instantly regardless of internet state. A reading is posted every 5 seconds regardless of alarm state; a one-off alert row is posted only on the moment a hazard _starts_.
 
 ## Tech stack
 
-| Layer | Tool | Notes |
-|---|---|---|
-| Sensing | ESP32, MQ-2 gas sensor, DHT22, photoresistor | All simulated in [Wokwi](https://wokwi.com) — no physical hardware required. Photoresistor stands in for a flame sensor (Wokwi has no native flame part) |
-| Firmware | Arduino (C++) | Threshold logic, local alarm, HTTPS POST to Supabase |
-| Backend | [Supabase](https://supabase.com) | Postgres database + REST API + Realtime — no custom server |
-| Frontend | React + Vite, `react-router-dom`, `recharts` | 4-page live dashboard |
+| Layer    | Tool                                         | Notes                                                                                                                                                    |
+| -------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Sensing  | ESP32, MQ-2 gas sensor, DHT22, photoresistor | All simulated in [Wokwi](https://wokwi.com) — no physical hardware required. Photoresistor stands in for a flame sensor (Wokwi has no native flame part) |
+| Firmware | Arduino (C++)                                | Threshold logic, local alarm, HTTPS POST to Supabase                                                                                                     |
+| Backend  | [Supabase](https://supabase.com)             | Postgres database + REST API + Realtime — no custom server                                                                                               |
+| Frontend | React + Vite, `react-router-dom`, `recharts` | 4-page live dashboard                                                                                                                                    |
 
 ## Dashboard pages
 
-| Route | Purpose |
-|---|---|
-| `/` | Landing page — problem, how it works, hazard types |
-| `/dashboard` | Live readouts + alert log, updating in real time |
-| `/history` | Trend charts of recent readings + summary stats |
-| `/about` | Architecture diagram, tech stack, problem statement |
+| Route        | Purpose                                             |
+| ------------ | --------------------------------------------------- |
+| `/`          | Landing page — problem, how it works, hazard types  |
+| `/dashboard` | Live readouts + alert log, updating in real time    |
+| `/history`   | Trend charts of recent readings + summary stats     |
+| `/about`     | Architecture diagram, tech stack, problem statement |
 
 ## Project structure
 
@@ -84,9 +84,10 @@ hostelguard/
 Create a free [Supabase](https://supabase.com) project → SQL Editor → run `supabase/schema.sql` → copy your Project URL and anon key from Settings → API.
 
 **2. Simulation**
-Go to [wokwi.com](https://wokwi.com) → new ESP32 project → paste in `wokwi/hostelguard_firmware/hostelguard_firmware.ino` and `wokwi/diagram.json` → add your Supabase credentials into the firmware → run the simulation.
+Go to [wokwi.com](https://wokwi.com) → new ESP32 project → paste in `wokwi/hostelguard_firmware/hostelguard_firmware.ino` and `wokwi/diagram.json`. From the `dashboard` directory, run `npm run firmware:config` to generate the ignored firmware config from the same `.env` used by the dashboard, then run the simulation.
 
 **3. Dashboard**
+
 ```bash
 cd dashboard
 npm install

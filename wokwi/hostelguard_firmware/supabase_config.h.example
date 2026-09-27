@@ -1,4 +1,0 @@
-#pragma once
-
-#define SUPABASE_URL "https://YOUR-PROJECT-REF.supabase.co"
-#define SUPABASE_ANON_KEY "YOUR-ANON-KEY"
