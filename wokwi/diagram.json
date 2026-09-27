@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "author": "HostelGuard",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+    { "type": "wokwi-dht22", "id": "dht1", "top": -190, "left": -280, "attrs": {} },
+    { "type": "wokwi-gas-sensor", "id": "gas1", "top": -190, "left": 140, "attrs": { "ppm": "400" } },
+    { "type": "wokwi-photoresistor-sensor", "id": "flame1", "top": 40, "left": -340, "attrs": {} },
+    { "type": "wokwi-buzzer", "id": "buzzer1", "top": 60, "left": 240, "attrs": { "volume": "0.2" } },
+    { "type": "wokwi-resistor", "id": "r1", "top": 190, "left": 160, "attrs": { "value": "220" } },
+    { "type": "wokwi-led", "id": "led1", "top": 190, "left": 240, "attrs": { "color": "red" } }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+
+    [ "dht1:VCC", "esp:3V3", "red", [] ],
+    [ "dht1:GND", "esp:GND.1", "black", [] ],
+    [ "dht1:SDA", "esp:4", "green", [] ],
+
+    [ "gas1:VCC", "esp:3V3", "red", [] ],
+    [ "gas1:GND", "esp:GND.1", "black", [] ],
+    [ "gas1:AOUT", "esp:34", "yellow", [] ],
+
+    [ "flame1:VCC", "esp:3V3", "red", [] ],
+    [ "flame1:GND", "esp:GND.1", "black", [] ],
+    [ "flame1:AO", "esp:35", "orange", [] ],
+
+    [ "buzzer1:1", "esp:25", "purple", [] ],
+    [ "buzzer1:2", "esp:GND.1", "black", [] ],
+
+    [ "r1:1", "esp:26", "blue", [] ],
+    [ "r1:2", "led1:A", "blue", [] ],
+    [ "led1:C", "esp:GND.1", "black", [] ]
+  ],
+  "dependencies": {}
+}
