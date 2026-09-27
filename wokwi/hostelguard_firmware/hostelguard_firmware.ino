@@ -16,8 +16,8 @@ const char* WIFI_SSID = "Wokwi-GUEST";
 const char* WIFI_PASS = "";
 
 // ---- Supabase project config — fill these in from Settings > API ----
-const char* SUPABASE_URL      = "https://YOUR-PROJECT-REF.supabase.co";
-const char* SUPABASE_ANON_KEY = "YOUR-ANON-KEY";
+const char* SUPABASE_URL      = VITE_SUPABASE_URL;  // e.g. "https://YOUR-PROJECT-REF.supabase.co"
+const char* SUPABASE_ANON_KEY = VITE_SUPABASE_ANON_KEY;
 
 // ---- Pins ----
 #define DHT_PIN       4
