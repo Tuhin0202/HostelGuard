@@ -21,10 +21,10 @@ Hostels, labs, and shared living spaces rarely have any automated hazard detecti
 ## Architecture
 
 ```
- ┌──────────────────────┐      HTTPS POST       ┌────────────────┐      Realtime push      ┌───────────────────┐
+ ┌──────────────────────┐      HTTPS POST       ┌────────────────┐      Realtime push         ┌───────────────────┐
  │   Simulated ESP32     │ ───────────────────▶  │    Supabase    │ ───────────────────────▶ │  React Dashboard   │
- │   (Wokwi, in-browser) │   readings + alerts   │ (Postgres +    │      (WebSocket)         │  (Vite, 4 pages)   │
- │   MQ-2 · DHT22 ·       │                        │  Realtime)     │                           │                    │
+ │   (Wokwi, in-browser) │   readings + alerts   │ (Postgres +    │      (WebSocket)          │  (Vite, 4 pages)   │
+ │   MQ-2 · DHT22 ·       │                        │  Realtime)     │                          │                   │
  │   flame-sensor stand-in│                       └────────────────┘                           └───────────────────┘
  │   + buzzer + LED       │
  └──────────────────────┘
