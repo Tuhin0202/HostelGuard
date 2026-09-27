@@ -12,46 +12,49 @@
 // ---- WiFi ----
 // "Wokwi-GUEST" only works inside the Wokwi simulator and has real internet
 // access. On real hardware, replace with your actual WiFi credentials.
-const char* WIFI_SSID = "Wokwi-GUEST";
-const char* WIFI_PASS = "";
+const char *WIFI_SSID = "Wokwi-GUEST";
+const char *WIFI_PASS = "";
 
 // ---- Supabase project config — fill these in from Settings > API ----
-const char* SUPABASE_URL      = VITE_SUPABASE_URL;  // e.g. "https://YOUR-PROJECT-REF.supabase.co"
-const char* SUPABASE_ANON_KEY = VITE_SUPABASE_ANON_KEY;
+const char *SUPABASE_URL = "https://onjvjbbzvykgsjlkqunz.supabase.co";
+const char *SUPABASE_ANON_KEY = "sb_publishable_Krr4kyS1XXkIgLpRlnM-bQ_pT8k-uDW";
 
 // ---- Pins ----
-#define DHT_PIN       4
-#define GAS_PIN       34   // MQ-2 analog out (ADC1, safe to use with WiFi on)
-#define FLAME_PIN     35   // flame-sensor stand-in, analog out (ADC1)
-#define BUZZER_PIN    25
+#define DHT_PIN 4
+#define GAS_PIN 34   // MQ-2 analog out (ADC1, safe to use with WiFi on)
+#define FLAME_PIN 35 // flame-sensor stand-in, analog out (ADC1)
+#define BUZZER_PIN 25
 #define ALARM_LED_PIN 26
 
-#define DHTTYPE DHT22   // Wokwi's DHT part behaves as a DHT22; use DHT11 on real hardware
+#define DHTTYPE DHT22 // Wokwi's DHT part behaves as a DHT22; use DHT11 on real hardware
 DHT dht(DHT_PIN, DHTTYPE);
 
 // ---- Alarm thresholds — tune these while testing ----
-const int   GAS_THRESHOLD   = 1500;  // raw ADC, 0-4095
-const int   FLAME_THRESHOLD = 3000;  // raw ADC, higher = brighter/closer flame
-const float TEMP_THRESHOLD  = 45.0;  // °C
+const int GAS_THRESHOLD = 1500;    // raw ADC, 0-4095
+const int FLAME_THRESHOLD = 3000;  // raw ADC, higher = brighter/closer flame
+const float TEMP_THRESHOLD = 45.0; // °C
 
-const char* ROOM_LABEL = "Hostel Block A - Room 204";
+const char *ROOM_LABEL = "Hostel Block A - Room 204";
 
 unsigned long lastReadingPost = 0;
 const unsigned long READING_INTERVAL_MS = 5000;
 
 bool alarmActive = false;
 
-void connectWiFi() {
+void connectWiFi()
+{
   WiFi.begin(WIFI_SSID, WIFI_PASS);
   Serial.print("Connecting to WiFi");
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED)
+  {
     delay(300);
     Serial.print(".");
   }
   Serial.println(" connected");
 }
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
   pinMode(BUZZER_PIN, OUTPUT);
   pinMode(ALARM_LED_PIN, OUTPUT);
@@ -59,13 +62,16 @@ void setup() {
   connectWiFi();
 }
 
-void setAlarm(bool on) {
+void setAlarm(bool on)
+{
   digitalWrite(BUZZER_PIN, on ? HIGH : LOW);
   digitalWrite(ALARM_LED_PIN, on ? HIGH : LOW);
 }
 
-void postReading(float temp, float hum, int gasRaw, int flameRaw, bool alarm) {
-  if (WiFi.status() != WL_CONNECTED) return;
+void postReading(float temp, float hum, int gasRaw, int flameRaw, bool alarm)
+{
+  if (WiFi.status() != WL_CONNECTED)
+    return;
 
   WiFiClientSecure client;
   client.setInsecure(); // demo only — skips TLS cert validation
@@ -92,8 +98,10 @@ void postReading(float temp, float hum, int gasRaw, int flameRaw, bool alarm) {
   http.end();
 }
 
-void postAlert(const char* type, const char* message) {
-  if (WiFi.status() != WL_CONNECTED) return;
+void postAlert(const char *type, const char *message)
+{
+  if (WiFi.status() != WL_CONNECTED)
+    return;
 
   WiFiClientSecure client;
   client.setInsecure();
@@ -118,15 +126,16 @@ void postAlert(const char* type, const char* message) {
   http.end();
 }
 
-void loop() {
-  int gasRaw   = analogRead(GAS_PIN);
+void loop()
+{
+  int gasRaw = analogRead(GAS_PIN);
   int flameRaw = analogRead(FLAME_PIN);
-  float temp   = dht.readTemperature();
-  float hum    = dht.readHumidity();
+  float temp = dht.readTemperature();
+  float hum = dht.readHumidity();
 
-  bool gasBreach   = gasRaw > GAS_THRESHOLD;
+  bool gasBreach = gasRaw > GAS_THRESHOLD;
   bool flameBreach = flameRaw > FLAME_THRESHOLD;
-  bool tempBreach  = !isnan(temp) && temp > TEMP_THRESHOLD;
+  bool tempBreach = !isnan(temp) && temp > TEMP_THRESHOLD;
   bool shouldAlarm = gasBreach || flameBreach || tempBreach;
 
   Serial.printf("gas=%d flame=%d temp=%.1f hum=%.1f alarm=%d\n",
@@ -136,14 +145,19 @@ void loop() {
 
   // Only fire a new alert row on the OFF -> ON transition, so the log
   // doesn't spam one row per loop while a hazard is ongoing.
-  if (shouldAlarm && !alarmActive) {
-    if (gasBreach)   postAlert("gas", "Gas/smoke level exceeded safe threshold");
-    if (flameBreach) postAlert("fire", "Flame sensor triggered");
-    if (tempBreach)  postAlert("temperature", "Room temperature abnormally high");
+  if (shouldAlarm && !alarmActive)
+  {
+    if (gasBreach)
+      postAlert("gas", "Gas/smoke level exceeded safe threshold");
+    if (flameBreach)
+      postAlert("fire", "Flame sensor triggered");
+    if (tempBreach)
+      postAlert("temperature", "Room temperature abnormally high");
   }
   alarmActive = shouldAlarm;
 
-  if (millis() - lastReadingPost > READING_INTERVAL_MS) {
+  if (millis() - lastReadingPost > READING_INTERVAL_MS)
+  {
     lastReadingPost = millis();
     postReading(temp, hum, gasRaw, flameRaw, shouldAlarm);
   }
