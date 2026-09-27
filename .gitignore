@@ -1,0 +1,31 @@
+# Dependencies
+dashboard/node_modules/
+.venv/
+
+# Build and coverage output
+dashboard/dist/
+dashboard/coverage/
+
+# Local environment files
+dashboard/.env
+dashboard/.env.*
+!dashboard/.env.example
+
+# Supabase local schema
+supabase/schema.sql
+
+# Wokwi and Arduino generated files
+wokwi/.pio/
+wokwi/.vscode/
+wokwi/hostelguard_firmware/build/
+wokwi/hostelguard_firmware/*.hex
+wokwi/hostelguard_firmware/*.bin
+wokwi/hostelguard_firmware/*.elf
+
+# Editor and operating system files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
