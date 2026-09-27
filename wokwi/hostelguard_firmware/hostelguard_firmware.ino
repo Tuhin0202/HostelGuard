@@ -34,7 +34,7 @@ const float TEMP_THRESHOLD = 45.0; // °C
 const char *ROOM_LABEL = "Hostel Block A - Room 204";
 
 unsigned long lastReadingPost = 0;
-const unsigned long READING_INTERVAL_MS = 5000;
+const unsigned long READING_INTERVAL_MS = 20000;
 
 bool alarmActive = false;
 
