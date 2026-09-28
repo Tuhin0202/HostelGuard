@@ -7,7 +7,6 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['logo.jpg', 'hero-bg.jpg', 'esp32.jpg', 'supabase.jpg', 'web.jpg'],
       manifest: {
         name: 'HostelGuard',
         short_name: 'HostelGuard',
@@ -15,21 +14,29 @@ export default defineConfig({
         start_url: '/',
         scope: '/',
         display: 'standalone',
-        theme_color: '#06101C',
-        background_color: '#06101C',
+        theme_color: '#001741',
+        background_color: '#001741',
         icons: [
           {
-            src: 'icon-192x192.png',
+            src: '/icon-192x192.png',
             sizes: '192x192',
-            type: 'image/png'
+            type: 'image/png',
+            purpose: 'any'
           },
           {
-            src: 'icon-512x512.png',
+            src: '/icon-512x512.png',
             sizes: '512x512',
-            type: 'image/png'
+            type: 'image/png',
+            purpose: 'any'
           },
           {
-            src: 'icon-maskable-512x512.png',
+            src: '/icon-maskable-192x192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'maskable'
+          },
+          {
+            src: '/icon-maskable-512x512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable'
@@ -38,14 +45,10 @@ export default defineConfig({
       },
       workbox: {
         navigateFallback: '/index.html',
-        navigateFallbackDenylist: [/^\/supabase/],
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
-            handler: 'NetworkOnly',
-            options: {
-              cacheName: 'supabase-api',
-            }
+            urlPattern: /^https:\/\/.*\.supabase\.co\/.*/,
+            handler: 'NetworkOnly'
           }
         ]
       }
