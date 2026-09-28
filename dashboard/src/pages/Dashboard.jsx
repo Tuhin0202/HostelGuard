@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../supabaseClient'
-import { Building2, Activity } from 'lucide-react'
+import { Building2, Activity, WifiOff } from 'lucide-react'
 import SensorCard from '../components/SensorCard'
 import AlertLog from '../components/AlertLog'
 import RoomStatus from '../components/RoomStatus'
@@ -16,6 +16,18 @@ export default function Dashboard() {
   const [reading, setReading] = useState(null)
   const [alerts, setAlerts] = useState([])
   const [connected, setConnected] = useState(false)
+  const [isOffline, setIsOffline] = useState(!navigator.onLine)
+
+  useEffect(() => {
+    const handleOnline = () => setIsOffline(false)
+    const handleOffline = () => setIsOffline(true)
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
+    return () => {
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
+    }
+  }, [])
 
   const loadInitial = useCallback(async () => {
     const { data: readingRows } = await supabase
@@ -64,6 +76,12 @@ export default function Dashboard() {
 
   return (
     <div className="app dashboard-page">
+      {isOffline && (
+        <div className="offline-banner">
+          <WifiOff size={18} />
+          <span>You are offline. Live data unavailable</span>
+        </div>
+      )}
       <header className="dashboard-header">
         <div className="dashboard-room-info">
           <div className="building-icon-wrapper">
