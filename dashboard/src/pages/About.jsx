@@ -193,7 +193,7 @@ export default function About() {
             <h3>Built For</h3>
           </div>
           <p className="about-info-text">
-            A 24-hour hackathon using only free tools — no physical hardware required.
+            A 36-hour hackathon using only free tools — no physical hardware required.
           </p>
           <div className="built-for-badge">
             <Code size={16} />
