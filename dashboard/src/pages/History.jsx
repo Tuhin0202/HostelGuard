@@ -63,9 +63,9 @@ export default function History() {
     const q = searchQuery.toLowerCase();
     return readings.filter(r => {
       let status = 'Normal'
-      if (r.gas_raw > 400) status = 'Gas Alert'
-      else if (r.temperature > 50) status = 'Temp Alert'
-      else if (r.flame_level > 300) status = 'Flame Alert'
+      if (r.gas_raw > 1500) status = 'Gas Alert'
+      else if (r.temperature > 45) status = 'Temp Alert'
+      else if (r.flame_level > 3000) status = 'Flame Alert'
       
       return (
         status.toLowerCase().includes(q) ||
@@ -86,9 +86,9 @@ export default function History() {
   }
 
   const getStatus = (r) => {
-    if (r.gas_raw > 400) return { label: 'Gas Alert', class: 'gas' }
-    if (r.temperature > 50) return { label: 'Temp Alert', class: 'temperature' }
-    if (r.flame_level > 300) return { label: 'Flame Alert', class: 'fire' }
+    if (r.gas_raw > 1500) return { label: 'Gas Alert', class: 'gas' }
+    if (r.temperature > 45) return { label: 'Temp Alert', class: 'temperature' }
+    if (r.flame_level > 3000) return { label: 'Flame Alert', class: 'fire' }
     return { label: 'Normal', class: 'safe' }
   }
 
@@ -168,7 +168,7 @@ export default function History() {
               <Cloud size={18} className="text-accent" />
               <h4>Gas / Smoke Levels (MQ-2)</h4>
             </div>
-            <span className="chart-threshold-badge gas">Threshold: 400 ppm</span>
+            <span className="chart-threshold-badge gas">Threshold: 1500 raw</span>
           </div>
           <div className="chart-wrapper">
             <ResponsiveContainer width="100%" height={180}>
@@ -183,14 +183,14 @@ export default function History() {
                 <XAxis dataKey="timeLabel" stroke="#8993a1" tick={{ fill: '#8993a1', fontSize: 11 }} tickMargin={10} axisLine={false} tickLine={false} minTickGap={20} />
                 <YAxis stroke="#8993a1" tick={{ fill: '#8993a1', fontSize: 11 }} axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} />
-                <ReferenceLine y={400} stroke="#e5484d" strokeDasharray="3 3" />
-                <Area type="monotone" dataKey="gas_raw" name="Gas (ppm)" stroke="#4fa8e0" strokeWidth={2} fillOpacity={1} fill="url(#colorGas)" />
+                <ReferenceLine y={1500} stroke="#e5484d" strokeDasharray="3 3" />
+                <Area type="monotone" dataKey="gas_raw" name="Gas (raw)" stroke="#4fa8e0" strokeWidth={2} fillOpacity={1} fill="url(#colorGas)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
           <div className="chart-legend">
-            <span className="legend-item"><span className="legend-dot" style={{background: '#4fa8e0'}}></span> Gas Level (ppm)</span>
-            <span className="legend-item"><span className="legend-dash" style={{borderColor: '#e5484d'}}></span> Threshold (400 ppm)</span>
+            <span className="legend-item"><span className="legend-dot" style={{background: '#4fa8e0'}}></span> Gas Level (raw)</span>
+            <span className="legend-item"><span className="legend-dash" style={{borderColor: '#e5484d'}}></span> Threshold (1500 raw)</span>
           </div>
         </div>
 
@@ -201,7 +201,7 @@ export default function History() {
               <Thermometer size={18} style={{ color: '#f5a623' }} />
               <h4>Temperature (DHT22)</h4>
             </div>
-            <span className="chart-threshold-badge temp">Threshold: 50 °C</span>
+            <span className="chart-threshold-badge temp">Threshold: 45 °C</span>
           </div>
           <div className="chart-wrapper">
             <ResponsiveContainer width="100%" height={180}>
@@ -216,14 +216,14 @@ export default function History() {
                 <XAxis dataKey="timeLabel" stroke="#8993a1" tick={{ fill: '#8993a1', fontSize: 11 }} tickMargin={10} axisLine={false} tickLine={false} minTickGap={20} />
                 <YAxis stroke="#8993a1" tick={{ fill: '#8993a1', fontSize: 11 }} axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} />
-                <ReferenceLine y={50} stroke="#e5484d" strokeDasharray="3 3" />
+                <ReferenceLine y={45} stroke="#e5484d" strokeDasharray="3 3" />
                 <Area type="monotone" dataKey="temperature" name="Temp (°C)" stroke="#f5a623" strokeWidth={2} fillOpacity={1} fill="url(#colorTemp)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
           <div className="chart-legend">
             <span className="legend-item"><span className="legend-dot" style={{background: '#f5a623'}}></span> Temperature (°C)</span>
-            <span className="legend-item"><span className="legend-dash" style={{borderColor: '#e5484d'}}></span> Threshold (50 °C)</span>
+            <span className="legend-item"><span className="legend-dash" style={{borderColor: '#e5484d'}}></span> Threshold (45 °C)</span>
           </div>
         </div>
 
@@ -234,7 +234,7 @@ export default function History() {
               <Flame size={18} style={{ color: '#9b51e0' }} />
               <h4>Flame Level (Photosensor)</h4>
             </div>
-            <span className="chart-threshold-badge flame">Threshold: 300 units</span>
+            <span className="chart-threshold-badge flame">Threshold: 3000 level</span>
           </div>
           <div className="chart-wrapper">
             <ResponsiveContainer width="100%" height={180}>
@@ -249,14 +249,14 @@ export default function History() {
                 <XAxis dataKey="timeLabel" stroke="#8993a1" tick={{ fill: '#8993a1', fontSize: 11 }} tickMargin={10} axisLine={false} tickLine={false} minTickGap={20} />
                 <YAxis stroke="#8993a1" tick={{ fill: '#8993a1', fontSize: 11 }} axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} />
-                <ReferenceLine y={300} stroke="#e5484d" strokeDasharray="3 3" />
-                <Area type="monotone" dataKey="flame_level" name="Flame (units)" stroke="#9b51e0" strokeWidth={2} fillOpacity={1} fill="url(#colorFlame)" />
+                <ReferenceLine y={3000} stroke="#e5484d" strokeDasharray="3 3" />
+                <Area type="monotone" dataKey="flame_level" name="Flame (level)" stroke="#9b51e0" strokeWidth={2} fillOpacity={1} fill="url(#colorFlame)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
           <div className="chart-legend">
-            <span className="legend-item"><span className="legend-dot" style={{background: '#9b51e0'}}></span> Flame Level (units)</span>
-            <span className="legend-item"><span className="legend-dash" style={{borderColor: '#e5484d'}}></span> Threshold (300 units)</span>
+            <span className="legend-item"><span className="legend-dot" style={{background: '#9b51e0'}}></span> Flame Level (level)</span>
+            <span className="legend-item"><span className="legend-dash" style={{borderColor: '#e5484d'}}></span> Threshold (3000 level)</span>
           </div>
         </div>
       </div>
@@ -283,9 +283,9 @@ export default function History() {
               <tr>
                 <th>#</th>
                 <th>Timestamp</th>
-                <th>Gas (ppm)</th>
+                <th>Gas (raw)</th>
                 <th>Temperature (°C)</th>
-                <th>Flame Level (units)</th>
+                <th>Flame Level (level)</th>
                 <th>Humidity (%)</th>
                 <th>Alert Status</th>
               </tr>
@@ -302,9 +302,9 @@ export default function History() {
                     <tr key={r.id}>
                       <td className="col-id">{String(i + 1).padStart(3, '0')}</td>
                       <td className="col-time">{formatDateTime(r.created_at)}</td>
-                      <td style={{ color: r.gas_raw > 400 ? 'var(--danger)' : 'var(--safe)', fontWeight: 600 }}>{r.gas_raw}</td>
-                      <td style={{ color: r.temperature > 50 ? 'var(--danger)' : 'var(--text)', fontWeight: r.temperature > 50 ? 600 : 400 }}>{r.temperature}</td>
-                      <td style={{ color: r.flame_level > 300 ? 'var(--danger)' : 'var(--text)', fontWeight: r.flame_level > 300 ? 600 : 400 }}>{r.flame_level}</td>
+                      <td style={{ color: r.gas_raw > 1500 ? 'var(--danger)' : 'var(--safe)', fontWeight: 600 }}>{r.gas_raw}</td>
+                      <td style={{ color: r.temperature > 45 ? 'var(--danger)' : 'var(--text)', fontWeight: r.temperature > 45 ? 600 : 400 }}>{r.temperature}</td>
+                      <td style={{ color: r.flame_level > 3000 ? 'var(--danger)' : 'var(--text)', fontWeight: r.flame_level > 3000 ? 600 : 400 }}>{r.flame_level}</td>
                       <td>{r.humidity}</td>
                       <td>
                         <span className={`alert-type-badge ${status.class} outlined`}>

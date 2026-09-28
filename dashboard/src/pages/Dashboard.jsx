@@ -1,16 +1,16 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../supabaseClient'
-import { Building2, Activity, ChevronDown } from 'lucide-react'
+import { Building2, Activity } from 'lucide-react'
 import SensorCard from '../components/SensorCard'
 import AlertLog from '../components/AlertLog'
 import RoomStatus from '../components/RoomStatus'
 
-const GAS_MAX = 1000
-const GAS_THRESHOLD = 400
-const FLAME_MAX = 1000
-const FLAME_THRESHOLD = 300
+const GAS_MAX = 4095
+const GAS_THRESHOLD = 1500
+const FLAME_MAX = 4095
+const FLAME_THRESHOLD = 3000
 const TEMP_MAX = 80
-const TEMP_THRESHOLD = 50
+const TEMP_THRESHOLD = 45
 
 export default function Dashboard() {
   const [reading, setReading] = useState(null)
@@ -73,7 +73,6 @@ export default function Dashboard() {
             <span className="room-label-small">Room</span>
             <div className="room-name-wrapper">
               <h2 className="room-name">{reading?.room_label || 'Block A - Room 101'}</h2>
-              <ChevronDown size={20} className="text-dim" />
             </div>
             <span className="room-building">Hostel Main Building</span>
           </div>
@@ -100,7 +99,7 @@ export default function Dashboard() {
           label="Gas / Smoke"
           sensorName="MQ-2 Sensor"
           value={reading?.gas_raw}
-          unit="ppm"
+          unit="raw"
           max={GAS_MAX}
           threshold={GAS_THRESHOLD}
           breached={reading?.gas_raw > GAS_THRESHOLD}
@@ -120,7 +119,7 @@ export default function Dashboard() {
           label="Flame Level"
           sensorName="Photoresistor Sensor"
           value={reading?.flame_level}
-          unit="units"
+          unit="level"
           max={FLAME_MAX}
           threshold={FLAME_THRESHOLD}
           breached={reading?.flame_level > FLAME_THRESHOLD}
