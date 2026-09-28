@@ -1,39 +1,16 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../supabaseClient'
+import { Building2, Activity, ChevronDown } from 'lucide-react'
+import SensorCard from '../components/SensorCard'
+import AlertLog from '../components/AlertLog'
+import RoomStatus from '../components/RoomStatus'
 
-// Keep these in sync with the thresholds in the ESP32 firmware
-const GAS_MAX = 4095
-const GAS_THRESHOLD = 1500
-const FLAME_MAX = 4095
-const FLAME_THRESHOLD = 3000
-const TEMP_MAX = 60
-const TEMP_THRESHOLD = 45
-
-function pct(value, max) {
-  if (value == null || Number.isNaN(value)) return 0
-  return Math.min(100, Math.max(0, (value / max) * 100))
-}
-
-function ReadoutCard({ label, value, unit, max, threshold, breached }) {
-  return (
-    <div className={`card ${breached ? 'card--breach' : ''}`}>
-      <div className="card__label">{label}</div>
-      <div className="card__value">
-        {value == null ? '—' : Math.round(value * 10) / 10}
-        <span className="card__unit">{unit}</span>
-      </div>
-      <div className="bar">
-        <div className="bar__fill" style={{ width: `${pct(value, max)}%` }} />
-        <div className="bar__threshold" style={{ left: `${pct(threshold, max)}%` }} />
-      </div>
-    </div>
-  )
-}
-
-function timeLabel(iso) {
-  if (!iso) return ''
-  return new Date(iso).toLocaleTimeString()
-}
+const GAS_MAX = 1000
+const GAS_THRESHOLD = 400
+const FLAME_MAX = 1000
+const FLAME_THRESHOLD = 300
+const TEMP_MAX = 80
+const TEMP_THRESHOLD = 50
 
 export default function Dashboard() {
   const [reading, setReading] = useState(null)
@@ -86,68 +63,84 @@ export default function Dashboard() {
   const alarmActive = reading?.alarm === true
 
   return (
-    <div className="app">
-      <header className="header">
-        <div className="header__title">
-          <span className="header__mark">HOSTELGUARD</span>
-          <span className="header__room">
-            {reading?.room_label ?? 'Awaiting first reading…'}
-          </span>
+    <div className="app dashboard-page">
+      <header className="dashboard-header">
+        <div className="dashboard-room-info">
+          <div className="building-icon-wrapper">
+            <Building2 size={28} className="text-accent" />
+          </div>
+          <div className="room-text">
+            <span className="room-label-small">Room</span>
+            <div className="room-name-wrapper">
+              <h2 className="room-name">{reading?.room_label || 'Block A - Room 101'}</h2>
+              <ChevronDown size={20} className="text-dim" />
+            </div>
+            <span className="room-building">Hostel Main Building</span>
+          </div>
         </div>
-        <div className={`status-pill ${alarmActive ? 'status-pill--alarm' : 'status-pill--safe'}`}>
-          <span className="status-pill__dot" />
-          {alarmActive ? 'ALARM ACTIVE' : connected ? 'MONITORING' : 'CONNECTING…'}
+        
+        <div className="dashboard-status-wrapper">
+          <div className="status-indicator">
+            <div className={`status-dot ${alarmActive ? 'danger' : 'safe'}`}></div>
+            <div className="status-text-wrapper">
+              <span className="status-title">{alarmActive ? 'ALARM ACTIVE' : 'MONITORING'}</span>
+              <span className="status-subtitle">{alarmActive ? 'Hazards detected' : 'All systems normal'}</span>
+            </div>
+          </div>
+          <div className="status-graphic">
+            <Activity size={32} className={alarmActive ? 'text-danger' : 'text-safe'} />
+            <span className="status-graphic-text">Live sensor data<br/>via Supabase</span>
+          </div>
         </div>
       </header>
 
-      <section className="grid">
-        <ReadoutCard
-          label="Gas / smoke"
+      <section className="sensors-grid">
+        <SensorCard 
+          type="gas"
+          label="Gas / Smoke"
+          sensorName="MQ-2 Sensor"
           value={reading?.gas_raw}
-          unit="raw"
+          unit="ppm"
           max={GAS_MAX}
           threshold={GAS_THRESHOLD}
           breached={reading?.gas_raw > GAS_THRESHOLD}
         />
-        <ReadoutCard
+        <SensorCard 
+          type="temperature"
           label="Temperature"
+          sensorName="DHT22 Sensor"
           value={reading?.temperature}
           unit="°C"
           max={TEMP_MAX}
           threshold={TEMP_THRESHOLD}
           breached={reading?.temperature > TEMP_THRESHOLD}
         />
-        <ReadoutCard
-          label="Flame level"
+        <SensorCard 
+          type="flame"
+          label="Flame Level"
+          sensorName="Photoresistor Sensor"
           value={reading?.flame_level}
-          unit="raw"
+          unit="units"
           max={FLAME_MAX}
           threshold={FLAME_THRESHOLD}
           breached={reading?.flame_level > FLAME_THRESHOLD}
         />
-        <ReadoutCard
+        <SensorCard 
+          type="humidity"
           label="Humidity"
+          sensorName="DHT22 Sensor"
           value={reading?.humidity}
           unit="%"
           max={100}
-          threshold={100}
-          breached={false}
+          threshold={90}
+          breached={reading?.humidity > 90}
         />
       </section>
 
-      <section className="log">
-        <div className="log__header">Alert log</div>
-        {alerts.length === 0 && <div className="log__empty">No alerts yet — all clear.</div>}
-        <ul className="log__list">
-          {alerts.map((a) => (
-            <li key={a.id} className={`log__row log__row--${a.alert_type}`}>
-              <span className="log__time">{timeLabel(a.created_at)}</span>
-              <span className="log__type">{a.alert_type}</span>
-              <span className="log__message">{a.message}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
+      <div className="dashboard-bottom-grid">
+        <AlertLog alerts={alerts} />
+        <RoomStatus roomLabel={reading?.room_label} lastUpdated={reading?.created_at} />
+      </div>
     </div>
   )
 }
