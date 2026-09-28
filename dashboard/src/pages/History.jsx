@@ -48,6 +48,33 @@ export default function History() {
 
   useEffect(() => {
     fetchData()
+
+    const readingsChannel = supabase
+      .channel('history-readings-live')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'readings' },
+        (payload) => {
+          setReadings((prev) => [payload.new, ...prev].slice(0, 50))
+        }
+      )
+      .subscribe()
+
+    const alertsChannel = supabase
+      .channel('history-alerts-live')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'alerts' },
+        (payload) => {
+          setAlerts((prev) => [{ id: payload.new.id }, ...prev])
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(readingsChannel)
+      supabase.removeChannel(alertsChannel)
+    }
   }, [])
 
   // For charts, we want ascending chronological order (oldest left, newest right)
