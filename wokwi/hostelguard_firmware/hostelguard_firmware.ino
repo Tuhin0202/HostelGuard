@@ -16,6 +16,10 @@
 const char *WIFI_SSID = "Wokwi-GUEST";
 const char *WIFI_PASS = "";
 
+// ---- Supabase project config — fill these in from Settings > API ----
+const char* SUPABASE_URL      = VITE_SUPABASE_URL;
+const char* SUPABASE_ANON_KEY = VITE_SUPABASE_ANON_KEY;
+
 // ---- Pins ----
 #define DHT_PIN 4
 #define GAS_PIN 34   // MQ-2 analog out (ADC1, safe to use with WiFi on)
